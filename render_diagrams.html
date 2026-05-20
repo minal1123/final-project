@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Load Testing Dashboard UML Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#000000',
+                lineColor: '#000000',
+                secondaryColor: '#ffffff',
+                tertiaryColor: '#ffffff',
+                actorBorder: '#000000',
+                actorBackground: '#ffffff'
+            },
+            flowchart: { curve: 'linear' }
+        });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 40px;
+            color: #111827;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .diagram-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .diagram-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background-color: #ffffff;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API Load Testing Dashboard</h1>
+            <p>UML Diagrams Portfolio for Semester Evaluation</p>
+        </div>
+
+        <!-- 1. Use Case -->
+        <div class="diagram-card" id="card-use-case">
+            <div class="diagram-title">1. Use Case Diagram</div>
+            <div class="mermaid">
+graph LR
+    subgraph System ["API Load Testing System Boundary"]
+        UC1(["Login"])
+        UC2(["Enter API URL"])
+        UC3(["Select Request Method"])
+        UC4(["Start Load Test"])
+        UC5(["Stop Load Test"])
+        UC6(["View Analytics"])
+        UC7(["View Charts"])
+        UC8(["View Test History"])
+        UC9(["Delete History"])
+        UC10(["Export Reports"])
+        UC11(["Manage Settings"])
+        UC12(["Handle Errors"])
+    end
+    
+    User((User))
+    Admin((Admin))
+    
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+    User --> UC8
+    User --> UC10
+    User --> UC11
+    
+    Admin --> UC1
+    Admin --> UC8
+    Admin --> UC9
+    Admin --> UC11
+    
+    UC4 -.->|includes| UC12
+    UC4 -.->|includes| UC6
+    UC6 -.->|extends| UC7
+            </div>
+        </div>
+
+        <!-- 2. Class Diagram -->
+        <div class="diagram-card" id="card-class">
+            <div class="diagram-title">2. Class Diagram</div>
+            <div class="mermaid">
+classDiagram
+    class User {
+        +int id
+        +string username
+        +string email
+        +login() bool
+        +logout()
+    }
+    class Authentication {
+        +sessionToken string
+        +authenticate(username, password) bool
+    }
+    class Dashboard {
+        +refreshStats()
+        +displayMetrics()
+    }
+    class APIRequest {
+        +string url
+        +string method
+        +dict headers
+        +string body
+        +validate() bool
+    }
+    class LoadTester {
+        +int totalRequests
+        +int concurrency
+        +float interval
+        +startTest()
+        +stopTest()
+        +getLiveProgress() dict
+    }
+    class Analytics {
+        +float avgResponseTime
+        +float minResponseTime
+        +float maxResponseTime
+        +float requestsPerSecond
+        +calculateStats(details)
+    }
+    class ChartManager {
+        +renderLineChart(data)
+        +renderPieChart(data)
+        +renderHistogram(data)
+    }
+    class TestHistory {
+        +listAllRuns() list
+        +loadRunDetails(runId) dict
+        +deleteRun(runId) bool
+    }
+    class DatabaseManager {
+        -string dbPath
+        +saveRun(metrics, details) int
+        +fetchRun(runId) dict
+        +deleteRun(runId) bool
+        +getStats() dict
+    }
+    class ErrorHandler {
+        +logError(errorMsg)
+        +displayFriendlyError(errorMsg)
+    }
+
+    User --> Authentication : uses
+    User --> Dashboard : views
+    Dashboard --> APIRequest : configures
+    Dashboard --> TestHistory : views
+    APIRequest --> LoadTester : runs
+    LoadTester --> Analytics : generates
+    Analytics --> ChartManager : visualizes
+    LoadTester --> DatabaseManager : persists
+    TestHistory --> DatabaseManager : queries
+    LoadTester --> ErrorHandler : delegates-to
+            </div>
+        </div>
+
+        <!-- 3. Sequence Diagram -->
+        <div class="diagram-card" id="card-sequence">
+            <div class="diagram-title">3. Sequence Diagram</div>
+            <div class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User
+    participant Frontend as React UI
+    participant Backend as Flask REST API
+    participant Tester as LoadTester Engine
+    participant DB as SQLite Database
+    participant Analytics as Analytics Module
+
+    User->>Frontend: Enter URL, concurrency & click "Start"
+    Frontend->>Frontend: Validate URL & fields client-side
+    Frontend->>Backend: POST /api/test/start (JSON config)
+    Backend->>Tester: Initialize LoadTester (spawn ThreadPoolExecutor)
+    Backend-->>Frontend: Return 202 Accepted (task_id)
+    
+    activate Tester
+    loop Run Concurrent Tasks
+        Tester->>Tester: Dispatch concurrent HTTP queries
+        Tester-->>Tester: Log code, response time & status
+    end
+    deactivate Tester
+    
+    loop Dynamic Progress Polling (200ms)
+        Frontend->>Backend: GET /api/test/status/{task_id}
+        Backend->>Tester: Retrieve metrics queue snapshot
+        Tester-->>Backend: Snapshot data
+        Backend-->>Frontend: Progress JSON & Console logs
+        Frontend->>Frontend: Render progress bar & logs console
+    end
+    
+    Tester->>Analytics: Calculate aggregate details
+    Analytics-->>Tester: Summarized aggregates
+    Tester->>DB: Save metrics summary & telemetry grid
+    DB-->>Tester: Save complete transaction
+    
+    Frontend->>Backend: GET /api/history/{id} (Final fetch)
+    Backend->>DB: Query finalized datasets
+    DB-->>Backend: SQLite datasets
+    Backend-->>Frontend: Return final payload
+    
+    Frontend->>Analytics: Send dataset to Chart.js
+    Analytics-->>Frontend: Render Line, Pie, & Scatter canvases
+    Frontend-->>User: Refresh Dashboard with interactive charts
+            </div>
+        </div>
+
+        <!-- 4. Activity Diagram -->
+        <div class="diagram-card" id="card-activity">
+            <div class="diagram-title">4. Activity Diagram</div>
+            <div class="mermaid">
+graph TD
+    Start([Start]) --> Input[Enter URL, Method, Concurrency, and Interval]
+    Input --> Validate{Is Input Valid?}
+    
+    Validate -->|No| ShowError[Show Validation Toast Alert] --> Input
+    Validate -->|Yes| StartBackend[Send POST /api/test/start to Flask]
+    
+    StartBackend --> RunThreads[Spawn Concurrent Worker Thread Pool]
+    RunThreads --> LoopRequests[Dispatch HTTP Request batch]
+    LoopRequests --> Collect[Receive HTTP Response codes]
+    
+    Collect --> IsStopped{User clicked Stop?}
+    IsStopped -->|Yes| Abort[Abort Remaining Threads] --> SaveData
+    IsStopped -->|No| IsFinished{All requests finished?}
+    
+    IsFinished -->|No| LoopRequests
+    IsFinished -->|Yes| SaveData
+    
+    SaveData[Calculate Aggregates & Start SQLite Transaction] --> DBConfirm{Save Successful?}
+    
+    DBConfirm -->|No| LogErr[Log Write Error to database log] --> Display
+    DBConfirm -->|Yes| Display[Refresh metrics cards & Chart.js graphs]
+    
+    Display --> End([End])
+            </div>
+        </div>
+
+        <!-- 5. State Machine Diagram -->
+        <div class="diagram-card" id="card-state">
+            <div class="diagram-title">5. State Machine Diagram</div>
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> WaitingForInput : User opens testing view
+    WaitingForInput --> WaitingForInput : Modifying inputs
+    WaitingForInput --> TestingStarted : Clicks "Start" [Valid config]
+    WaitingForInput --> ErrorState : Clicks "Start" [Invalid config]
+    
+    ErrorState --> WaitingForInput : User resets inputs
+    
+    state TestingStarted {
+        [*] --> SendingRequests
+        SendingRequests --> ReceivingResponses : HTTP Handshake
+        ReceivingResponses --> SendingRequests : Remaining requests > 0
+    }
+    
+    TestingStarted --> GeneratingAnalytics : Run completes / Stop signal sent
+    TestingStarted --> ErrorState : Target host unreachable / Network loss
+    
+    GeneratingAnalytics --> SavingResults : Math aggregates compiled
+    SavingResults --> Completed : DB transaction committed successfully
+    SavingResults --> ErrorState : SQLite disk locked / Write error
+    
+    Completed --> Idle : Navigate away
+    ErrorState --> Idle : User acknowledges warning
+            </div>
+        </div>
+
+        <!-- 6. ER Diagram -->
+        <div class="diagram-card" id="card-er">
+            <div class="diagram-title">6. Entity Relationship Diagram</div>
+            <div class="mermaid">
+erDiagram
+    USER ||--o{ API_TEST : executes
+    API_TEST ||--|| ANALYTICS : summarizes
+    API_TEST ||--o{ TEST_HISTORY : logs-detail
+    API_TEST ||--o{ ERROR_LOG : traces
+
+    USER {
+        int id PK
+        string username
+        string email
+        string password_hash
+    }
+    API_TEST {
+        int id PK
+        int user_id FK
+        string url
+        string method
+        string timestamp
+        int total_requests
+    }
+    ANALYTICS {
+        int id PK
+        int test_id FK
+        float avg_response_time
+        float min_response_time
+        float max_response_time
+        float requests_per_second
+        int success_count
+        int failure_count
+    }
+    TEST_HISTORY {
+        int id PK
+        int test_id FK
+        int request_index
+        int status_code
+        float response_time
+        boolean success
+        string error_message
+    }
+    ERROR_LOG {
+        int id PK
+        int test_id FK
+        string error_timestamp
+        string error_message
+        string error_stack
+    }
+            </div>
+        </div>
+
+        <!-- 7. Component Diagram -->
+        <div class="diagram-card" id="card-component">
+            <div class="diagram-title">7. Component Diagram</div>
+            <div class="mermaid">
+graph TB
+    subgraph UI ["Presentation Layer (React Frontend)"]
+        Components["React UI Elements"]
+        ChartJS["Chart.js Wrapper Module"]
+        APIClient["REST Client (Axios/Fetch)"]
+        
+        Components --> ChartJS
+        Components --> APIClient
+    end
+
+    subgraph Orchestrator ["Orchestrator Service (Flask Backend - Port 5000)"]
+        FlaskRouter["Flask REST Endpoint Controllers"]
+        AuthModule["Authentication Module"]
+        Gateway["Microservice Gateway Client"]
+        ErrService["Exception Error Handler"]
+
+        FlaskRouter --> AuthModule
+        FlaskRouter --> Gateway
+        Gateway --> ErrService
+    end
+
+    subgraph RunnerService ["Runner Microservice (Port 5001)"]
+        RunnerApp["Runner API Endpoint"]
+        TesterEngine["Load Tester Engine (ThreadPool)"]
+        
+        RunnerApp --> TesterEngine
+    end
+
+    subgraph Storage ["Data Access Layer (SQLite Engine)"]
+        DB[(SQLite File database.db)]
+        Schema["Relational Schema Model"]
+        Schema --> DB
+    end
+
+    APIClient -- HTTP JSON REST Requests --> FlaskRouter
+    Gateway -- HTTP Proxy Requests --> RunnerApp
+    Gateway --> Schema
+    ErrService --> Schema
+            </div>
+        </div>
+
+        <!-- 8. Deployment Diagram -->
+        <div class="diagram-card" id="card-deployment">
+            <div class="diagram-title">8. Deployment Diagram</div>
+            <div class="mermaid">
+graph TD
+    subgraph ClientNode ["User Hardware node"]
+        Browser["Chrome/Edge Web Browser (React SPA runtime)"]
+    end
+
+    subgraph WebServer ["Static Web Server (Nginx / Vercel Host)"]
+        BuildFiles["Static Assets (minified HTML, JS, CSS)"]
+    end
+
+    subgraph OrchestratorNode ["Orchestrator Server Node (Port 5000)"]
+        FlaskWSGI["Flask Backend API Application (Gunicorn WSGI)"]
+        SQLiteDB[(SQLite Database Engine: database.db file)]
+    end
+
+    subgraph RunnerNode ["Runner Microservice Node (Port 5001)"]
+        RunnerService["Load Tester Worker API (Port 5001)"]
+    end
+
+    Browser -- Downloads SPA bundle (HTTP Get) --> BuildFiles
+    Browser -- Communicates (HTTPS JSON REST / Port 5000) --> FlaskWSGI
+    FlaskWSGI -- Delegates Tasks (HTTP / Port 5001) --> RunnerService
+    FlaskWSGI -- Transaction Queries (Local File I/O) --> SQLiteDB
+            </div>
+        </div>
+    </div>
+</body>
+</html>
